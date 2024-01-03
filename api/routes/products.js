@@ -83,13 +83,18 @@ router.get("/training", async (req, res) => {
 });
 
 router.get("/:productID", async (req, res) => {
-  constmodels.Product = await models.Product.findByPk(req.params.productID, {
+  const product = await models.Product.findByPk(req.params.productID, {
     attributes: {
       exclude: ["description", "createdAt", "updatedAt", "size"],
     },
   });
-  console.log(JSON.stringify(product, null, 4));
-  res.status(200).json(product);
+  if (product) {
+    res.status(200).json(product);
+  } else {
+    res.status(404).json({
+      msg: "Product not found",
+    });
+  }
 });
 
 router.post("/", get_jwt, authorization, async (req, res) => {
@@ -103,6 +108,49 @@ router.post("/", get_jwt, authorization, async (req, res) => {
     });
     await newProduct.save();
     res.status(200).json(newProduct);
+  } catch (e) {
+    res.status(403).json({
+      msg: e.message,
+    });
+  }
+});
+
+router.put("/:productID", get_jwt, authorization, async (req, res) => {
+  try {
+    const product = await models.Product.findByPk(req.params.productID);
+    if (product) {
+      product.name = req.body.name ? req.body.name : product.name;
+      product.price = req.body.price ? req.body.price : product.price;
+      product.description = req.body.description
+        ? req.body.description
+        : product.description;
+      await product.save();
+      res.status(200).json(product);
+    } else {
+      res.status(404).json({
+        msg: "Product not found",
+      });
+    }
+  } catch (e) {
+    res.status(403).json({
+      msg: e.message,
+    });
+  }
+});
+
+router.delete("/:productID", get_jwt, authorization, async (req, res) => {
+  try {
+    const product = await models.Product.findByPk(req.params.productID);
+    if (product) {
+      await product.destroy();
+      res.status(200).json({
+        msg: "Product deleted",
+      });
+    } else {
+      res.status(404).json({
+        msg: "Product not found",
+      });
+    }
   } catch (e) {
     res.status(403).json({
       msg: e.message,
