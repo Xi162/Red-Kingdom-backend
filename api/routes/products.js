@@ -85,7 +85,7 @@ router.get("/training", async (req, res) => {
 router.get("/:productID", async (req, res) => {
   const product = await models.Product.findByPk(req.params.productID, {
     attributes: {
-      exclude: ["description", "createdAt", "updatedAt", "size"],
+      exclude: ["createdAt", "updatedAt", "size"],
     },
   });
   if (product) {
@@ -104,7 +104,6 @@ router.post("/", get_jwt, authorization, async (req, res) => {
       price: req.body.price,
       description: req.body.description,
       type: req.body.type,
-      size: req.body.size,
     });
     await newProduct.save();
     res.status(200).json(newProduct);

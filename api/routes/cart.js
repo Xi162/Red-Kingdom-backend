@@ -17,10 +17,12 @@ router.get("/:userID", get_jwt, authenticate, async (req, res) => {
     });
     cart = cart.map((item) => {
       let quantity = item.Cart.quantity;
+      let size = item.Cart.size;
       let { Cart, ...productInfo } = item.get();
       return {
         ...productInfo,
         quantity: quantity,
+        size: size,
       };
     });
     console.log(JSON.stringify(cart, null, 2));
@@ -46,20 +48,30 @@ router.get("/:userID", get_jwt, authenticate, async (req, res) => {
 router.post("/:userID", get_jwt, authenticate, async (req, res) => {
   const userID = req.params.userID;
   const productID = req.body.productID;
+  const size = req.body.size;
   try {
     if (!productID) throw new Error("Bad request");
     const user = await models.User.findByPk(userID);
     if (!user) throw new Error("No user found");
     let item = await models.Cart.findOne({
       where: {
-        UserId: userID,
-        ProductId: productID,
+        UserID: userID,
+        ProductID: productID,
+        size: size,
       },
     });
     // if item is already in cart, increment its quantity
     if (item !== null) await item.increment("quantity");
     // if item is not in cart, add it into cart
-    else await user.addProduct(productID);
+    else {
+      console.log(userID, productID, size);
+      const item = models.Cart.build({
+        UserID: userID,
+        ProductID: productID,
+        size: size,
+      });
+      await item.save();
+    }
     //test
     const items = await user.getProducts({
       attributes: ["id", "name", "price"],
@@ -83,6 +95,7 @@ router.post("/:userID", get_jwt, authenticate, async (req, res) => {
 router.delete("/:userID", get_jwt, authenticate, async (req, res) => {
   const userID = req.params.userID;
   const productID = req.body.productID;
+  const size = req.body.size;
   try {
     if (!productID) throw new Error("Bad request");
     const user = await models.User.findByPk(userID);
@@ -91,15 +104,15 @@ router.delete("/:userID", get_jwt, authenticate, async (req, res) => {
       where: {
         UserId: userID,
         ProductId: productID,
+        size: size,
       },
     });
-    // if item is already in cart, increment its quantity
+    // if item is already in cart, decrement its quantity
     if (item !== null) {
       await item.decrement("quantity");
       await item.reload();
       if (item.quantity === 0) await item.destroy();
     }
-    // if item is not in cart, add it into cart
     //test
     const items = await user.getProducts({
       attributes: ["id", "name", "price"],

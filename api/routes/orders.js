@@ -42,7 +42,7 @@ router.get("/", get_jwt, authorization, async (req, res) => {
   }
 });
 
-router.get("/:userID", get_jwt, authenticate, async (req, res) => {
+router.get("/user/:userID", get_jwt, authenticate, async (req, res) => {
   const userID = req.params.userID;
   try {
     const user = await models.User.findByPk(userID);
@@ -51,29 +51,8 @@ router.get("/:userID", get_jwt, authenticate, async (req, res) => {
     let orders = await user.getOrders();
     let resultOrders = [];
     //console.log(JSON.stringify(orders, null, 2));
-    for (let i = 0; i < orders.length; i++) {
-      let products = await orders[i].getProducts({
-        attributes: ["id", "name", "price"],
-        through: {
-          attributes: ["quantity"],
-        },
-      });
-      // restructure the object
-      products = products.map((product) => {
-        let quantity = product.OrderProduct.quantity;
-        let { OrderProduct, ...productInfo } = product.get();
-        return {
-          ...productInfo,
-          quantity: quantity,
-        };
-      });
-      resultOrders.push({
-        ...orders[i].get(),
-        products: products,
-      });
-    }
-    console.log(JSON.stringify(resultOrders, null, 2));
-    res.status(200).json(resultOrders);
+    console.log(JSON.stringify(orders, null, 2));
+    res.status(200).json(orders);
   } catch (e) {
     console.log(e);
     res.status(403).json({
@@ -82,7 +61,49 @@ router.get("/:userID", get_jwt, authenticate, async (req, res) => {
   }
 });
 
-router.post("/:userID", get_jwt, authenticate, async (req, res) => {
+router.get("/:orderID", get_jwt, async (req, res) => {
+  const orderID = req.params.orderID;
+  try {
+    let order = await models.Order.findOne({
+      where: {
+        id: orderID,
+      },
+    });
+    if (order === null) throw new Error("No order found");
+    if (req.user.userID !== order.UserId) throw new Error("Unauthenticated");
+    let products = await order.getProducts({
+      attributes: ["id", "name", "price"],
+      through: {
+        attributes: ["quantity", "size"],
+      },
+    });
+    console.log(JSON.stringify(products, null, 2));
+    // restructure the object
+    products = products.map((product) => {
+      let quantity = product.OrderProduct.quantity;
+      let size = product.OrderProduct.size;
+      let { OrderProduct, ...productInfo } = product.get();
+      return {
+        ...productInfo,
+        quantity: quantity,
+        size: size,
+      };
+    });
+    let resultOrder = {
+      ...order.get(),
+      products: products,
+    };
+    console.log(JSON.stringify(resultOrder, null, 2));
+    res.status(200).json(resultOrder);
+  } catch (e) {
+    console.log(e);
+    res.status(403).json({
+      msg: e.message,
+    });
+  }
+});
+
+router.post("/user/:userID", get_jwt, authenticate, async (req, res) => {
   const userID = req.params.userID;
   try {
     if (!req.body.receiver_name || !req.body.address || !req.body.paymentMethod)
@@ -114,16 +135,17 @@ router.post("/:userID", get_jwt, authenticate, async (req, res) => {
     // add products from cart to order
     items.forEach(async (item) => {
       await models.OrderProduct.create({
-        OrderId: newOrder.id,
-        ProductId: item.id,
+        OrderID: newOrder.id,
+        ProductID: item.id,
         quantity: item.Cart.quantity,
+        size: item.Cart.size,
       });
     });
 
     //empty cart
     await models.Cart.destroy({
       where: {
-        UserId: userID,
+        UserID: userID,
       },
     });
 

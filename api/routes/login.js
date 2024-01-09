@@ -32,7 +32,7 @@ router.post("/", async (req, res) => {
       },
       process.env.SECRET_KEY,
       {
-        expiresIn: "5m",
+        expiresIn: "1h",
       }
     );
     res.status(200).json({

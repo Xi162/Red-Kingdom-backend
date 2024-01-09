@@ -23,9 +23,6 @@ module.exports = async (sequelize) => {
         type: DataTypes.ENUM("Souvenir", "Bag", "Hat", "Official", "Training"),
         allowNull: false,
       },
-      size: {
-        type: DataTypes.STRING,
-      },
     },
     {
       timestamps: false,
