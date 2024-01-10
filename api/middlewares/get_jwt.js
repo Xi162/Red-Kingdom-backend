@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 
 function get_jwt(req, res, next) {
   const bearerToken = req.headers.authorization;
+  console.log(req.headers.authorization);
+  // console.log(req.body);
 
   if (!bearerToken) {
     return res.status(401).json({ msg: "Unauthenticated" });

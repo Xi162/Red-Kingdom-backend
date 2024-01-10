@@ -124,7 +124,7 @@ router.put("/:productID", get_jwt, authorization, async (req, res) => {
         ? req.body.description
         : product.description;
       await product.save();
-      res.status(200).json(product);
+      res.status(200).json({ ...product, msg: "Product updated" });
     } else {
       res.status(404).json({
         msg: "Product not found",

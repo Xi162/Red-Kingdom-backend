@@ -39,6 +39,7 @@ router.post("/", async (req, res) => {
       msg: "Login successfully",
       userID: user[0].id,
       isAdmin: user[0].isAdmin,
+      username: user[0].lastName,
       token: token,
     });
   } else {

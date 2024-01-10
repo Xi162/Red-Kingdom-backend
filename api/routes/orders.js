@@ -70,7 +70,8 @@ router.get("/:orderID", get_jwt, async (req, res) => {
       },
     });
     if (order === null) throw new Error("No order found");
-    if (req.user.userID !== order.UserId) throw new Error("Unauthenticated");
+    if (!req.user.isAmin && req.user.userID !== order.UserId)
+      throw new Error("Unauthenticated");
     let products = await order.getProducts({
       attributes: ["id", "name", "price"],
       through: {
@@ -106,6 +107,7 @@ router.get("/:orderID", get_jwt, async (req, res) => {
 router.post("/user/:userID", get_jwt, authenticate, async (req, res) => {
   const userID = req.params.userID;
   try {
+    console.log(req.body);
     if (!req.body.receiver_name || !req.body.address || !req.body.paymentMethod)
       throw new Error("Bad request");
     // get items from cart
