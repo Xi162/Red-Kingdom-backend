@@ -9,25 +9,27 @@
 
 Instructions on how to install and set up the project.
 
+Step 0: Make sure your MySQL is running on port 3306
+
 Step 1: Install Node packages
 
 ```
 $ npm install
 ```
 
-Step 2: Run the project on an appropriate port:
-
-```
-$ npm run server
-```
-
-Step 3: Create .env file and define MYSQL_PASSWORD and SECRET_KEY variable:
+Step 2: Create .env file and define MYSQL_PASSWORD and SECRET_KEY variable
 
 ```
 //File: .env
 
-MYSQL_PASSWORD="PASS_TO_YOUR_DATABASE"
+MYSQL_PASSWORD="PASSWORD_TO_YOUR_DATABASE"
 SECRET_KEY="SOME_KEY"
+```
+
+Step 3: Run the project on an appropriate port:
+
+```
+$ npm run server
 ```
 
 ## Usage
