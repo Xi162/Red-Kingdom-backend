@@ -24,11 +24,12 @@ $ npm run server
 ```
 
 Step 3: Create .env file and define MYSQL_PASSWORD and SECRET_KEY variable:
+.env
 
 ````
 MYSQL_PASSWORD="PASS_TO_YOUR_DATABASE"
 SECRET_KEY="SOME_KEY"
-```.env
+```
 
 ## Usage
 
