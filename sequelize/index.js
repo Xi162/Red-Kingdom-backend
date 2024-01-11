@@ -15,6 +15,7 @@ async function initializeSequelize() {
     require("./models/Product.model")(sequelize);
     require("./models/Cart.model")(sequelize);
     require("./models/Order.model")(sequelize);
+    require("./models/Article.model")(sequelize);
 
     //create relationship between models
     require("./relationships")(sequelize);

@@ -176,4 +176,34 @@ router.post("/user/:userID", get_jwt, authenticate, async (req, res) => {
   }
 });
 
+router.put("/:orderID", get_jwt, authorization, async (req, res) => {
+  const orderID = req.params.orderID;
+  try {
+    const order = await models.Order.findByPk(orderID);
+    if (order) {
+      order.receiver_name = req.body.receiver_name
+        ? req.body.receiver_name
+        : order.receiver_name;
+      order.address = req.body.address ? req.body.address : order.address;
+      order.paymentMethod = req.body.paymentMethod
+        ? req.body.paymentMethod
+        : order.paymentMethod;
+      order.status = req.body.status ? req.body.status : order.status;
+      order.deliverDate = req.body.deliverDate
+        ? new Date(req.body.deliverDate).toDateString()
+        : order.deliverDate;
+      await order.save();
+      res.status(200).json({ ...order, msg: "Order updated" });
+    } else {
+      res.status(404).json({
+        msg: "Order not found",
+      });
+    }
+  } catch (e) {
+    res.status(403).json({
+      msg: e.message,
+    });
+  }
+});
+
 module.exports = router;

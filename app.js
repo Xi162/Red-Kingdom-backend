@@ -9,6 +9,7 @@ const signupRouter = require("./api/routes/signup");
 const cartRouter = require("./api/routes/cart");
 const orderRouter = require("./api/routes/orders");
 const loginRouter = require("./api/routes/login");
+const articleRouter = require("./api/routes/article");
 
 initModels();
 
@@ -34,6 +35,7 @@ app.use("/signup", signupRouter);
 app.use("/cart", cartRouter);
 app.use("/orders", orderRouter);
 app.use("/login", loginRouter);
+app.use("/articles", articleRouter);
 
 app.get("/", (req, res) => {
   res.json({

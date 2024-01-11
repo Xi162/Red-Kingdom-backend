@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 
 module.exports = function setRelationships(sequelize) {
-  const { User, Product, Cart, Order } = sequelize.models;
+  const { User, Product, Cart, Order, Article } = sequelize.models;
   const OrderProduct = sequelize.define("OrderProduct", {
     OrderID: {
       type: DataTypes.UUID,
@@ -32,6 +32,37 @@ module.exports = function setRelationships(sequelize) {
       primaryKey: true,
     },
   });
+
+  const ArticleBlock = sequelize.define(
+    "ArticleBlock",
+    {
+      ArticleID: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        primaryKey: true,
+        references: {
+          model: Article,
+          key: "id",
+        },
+      },
+      BlockID: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+      },
+      type: {
+        type: DataTypes.ENUM("text", "image", "subtitle"),
+        allowNull: false,
+      },
+      content: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+    },
+    {
+      timestamps: false,
+    }
+  );
 
   User.belongsToMany(Product, {
     through: {
@@ -68,6 +99,23 @@ module.exports = function setRelationships(sequelize) {
     allowNull: false,
   });
   Order.belongsTo(User, {
+    allowNull: false,
+  });
+
+  Article.hasMany(ArticleBlock, {
+    foreignKey: "ArticleID",
+    onDelete: "CASCADE",
+    allowNull: false,
+  });
+  ArticleBlock.belongsTo(Article, {
+    foreignKey: "ArticleID",
+    allowNull: false,
+  });
+  Article.belongsTo(User, {
+    onDelete: "CASCADE",
+    allowNull: false,
+  });
+  User.hasMany(Article, {
     allowNull: false,
   });
 };
