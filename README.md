@@ -1,6 +1,6 @@
 # Project Name
 
-A brief description of the project.
+RED KINGDOM API
 
 ## Table of Contents
 
