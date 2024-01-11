@@ -10,6 +10,7 @@ A brief description of the project.
 ## Installation
 
 Instructions on how to install and set up the project.
+
 Step 1: Install Node packages
 
 ```
