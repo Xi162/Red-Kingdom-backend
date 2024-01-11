@@ -1,6 +1,4 @@
-# Project Name
-
-RED KINGDOM API
+# RED KINGDOM API
 
 ## Table of Contents
 
