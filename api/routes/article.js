@@ -91,7 +91,7 @@ router.post("/", get_jwt, authorization, async (req, res) => {
       let newContent = models.ArticleBlock.build({
         content: content.content,
         type: content.type,
-        BlockID: content.id,
+        BlockID: i,
         ArticleID: newArticle.id,
       });
       await newContent.save();
@@ -127,7 +127,7 @@ router.put("/:id", get_jwt, authorization, async (req, res) => {
       let newContent = models.ArticleBlock.build({
         content: content.content,
         type: content.type,
-        BlockID: content.id,
+        BlockID: i,
         ArticleID: article.id,
       });
       await newContent.save();
