@@ -70,7 +70,8 @@ router.get("/:orderID", get_jwt, async (req, res) => {
       },
     });
     if (order === null) throw new Error("No order found");
-    if (!req.user.isAmin && req.user.userID !== order.UserId)
+    console.log(req.user.isAdmin);
+    if (!req.user.isAdmin && req.user.userID !== order.UserId)
       throw new Error("Unauthenticated");
     let products = await order.getProducts({
       attributes: ["id", "name", "price"],
@@ -189,9 +190,10 @@ router.put("/:orderID", get_jwt, authorization, async (req, res) => {
         ? req.body.paymentMethod
         : order.paymentMethod;
       order.status = req.body.status ? req.body.status : order.status;
-      order.deliverDate = req.body.deliverDate
-        ? new Date(req.body.deliverDate).toDateString()
-        : order.deliverDate;
+      order.deliverDate =
+        order.status !== "cancelled" && req.body.deliverDate
+          ? new Date(req.body.deliverDate).toDateString()
+          : order.deliverDate;
       await order.save();
       res.status(200).json({ ...order, msg: "Order updated" });
     } else {
